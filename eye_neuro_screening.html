@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1728">
+<title>NeuroGuardian AI — Eye &amp; Symptom Screening</title>
+<script src="ng-core.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#f3f6f8;color:#17202b}
+.top{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #dce5eb;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.back{width:44px;height:44px;border-radius:12px;background:#eaf5f7;border:1px solid #d4e6ea;text-decoration:none;display:grid;place-items:center;font-size:22px;color:#0b1728}
+.top h1{font-size:19px;color:#0b1728}.top p{font-size:11px;color:#64748b;margin-top:2px}.lang{margin-left:auto;padding:9px;border:1px solid #dce5eb;border-radius:9px;background:#fff}
+.main{max-width:1150px;margin:auto;padding:16px}.notice{background:#fff5e3;border:1px solid #f0d29b;color:#765316;padding:12px;border-radius:12px;font-size:13px;line-height:1.5;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}@media(max-width:850px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid #dce5eb;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 8px 25px #1020300b}
+.card h2{font-size:17px;color:#0b1728;margin-bottom:6px}.sub{font-size:12.5px;color:#64748b;line-height:1.5;margin-bottom:12px}
+.cam{position:relative;aspect-ratio:4/3;background:#07111e;border-radius:14px;overflow:hidden}@media(max-width:600px){.cam{aspect-ratio:3/4}}
+.cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}#ov{position:absolute;inset:0;width:100%;height:100%}
+.st{position:absolute;left:10px;top:10px;background:#07111ed9;color:#fff;padding:7px 10px;border-radius:20px;font-size:11px;max-width:90%}
+.guide{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:70%;height:50%;border:2px dashed #ffffffb8;border-radius:45%;box-shadow:0 0 0 999px #0002;pointer-events:none}
+.cam.scanning{outline:3px solid #76e0cc}
+.row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}.btn{flex:1;min-width:120px;min-height:46px;border-radius:11px;border:0;font-weight:bold;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px}
+.pri{background:#0b1728;color:#fff}.sec{background:#fff;color:#26768b;border:1.5px solid #26768b}.btn:disabled{opacity:.45;cursor:not-allowed}
+.pg{height:8px;background:#e8eef2;border-radius:20px;margin-top:12px;overflow:hidden}#bar{height:100%;width:0;background:#26768b;transition:.2s}.pt{display:flex;justify-content:space-between;color:#64748b;font-size:11px;margin-top:5px}
+#pv{display:none;width:100%;max-height:260px;object-fit:contain;border-radius:10px;background:#07111e;margin-top:12px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}@media(max-width:500px){.sg{grid-template-columns:1fr}}
+.sg label,.fl{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 0}.sg input{width:18px;height:18px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.f2 label{font-size:12px;color:#64748b;display:block;margin-bottom:4px}
+select,input[type=number]{width:100%;padding:10px;border:1px solid #dce5eb;border-radius:9px;font-size:14px;background:#fff}
+.tw{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center;font-size:12px;color:#475569}canvas.tc{width:100%;max-width:200px;border:1px solid #dce5eb;border-radius:8px;background:#fff}
+.mt{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{border:1px solid #dce5eb;border-radius:12px;padding:10px;background:#fbfcfd}.metric span{font-size:11px;color:#64748b}.metric b{display:block;color:#0b1728;font-size:16px;margin-top:4px}
+.good{background:#eaf8ef;border-color:#c6e5d1}.warn{background:#fff5e3;border-color:#f0d29b}.bad{background:#fdeceb;border-color:#f1c0bb}
+.vc b.vv{font-size:20px;color:#0b1728}.sim{margin-top:10px;padding:12px;border-radius:10px;background:#fff;border:1px solid #dce5eb;transition:filter .3s}.sim h4{font-size:18px}.sim p{font-size:13px;margin-top:4px}
+.eyes{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:center;font-size:12px;color:#475569}.eyesvg{width:100%;background:#f1e4dc;border-radius:12px}
+.vd{padding:14px;border-radius:12px;margin-bottom:12px}.vd h3{font-size:16px;margin-bottom:4px}.vd p{font-size:13px;line-height:1.5}
+.fi{display:flex;justify-content:space-between;gap:10px;padding:9px 10px;border-radius:9px;margin-top:6px;font-size:13px;border:1px solid #dce5eb}.fi b{text-align:right}
+.sec2{font-size:14px;color:#0b1728;margin:16px 0 6px;font-weight:bold}ul.l{padding-left:18px;font-size:13px;line-height:1.65;color:#334155}.cz{padding:9px 10px;border:1px solid #dce5eb;border-radius:9px;margin-top:6px;font-size:13px;line-height:1.5}.cz i{font-style:normal;font-size:11px;font-weight:bold;color:#26768b}
+#db{font-size:12px;color:#64748b;margin-top:12px}.foot{font-size:11px;color:#7a8795;line-height:1.5;margin-top:10px}
+</style></head><body>
+<header class="top"><a class="back" href="Dashboard.html" aria-label="Back to Dashboard">←</a>
+<div><h1 data-k="title">Eye &amp; Symptom Screening</h1><p data-k="sub">Eye scan • redness cause • care plan</p></div>
+<select class="lang" id="lang" aria-label="Language"><option value="en">English</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option><option value="ur">اردو</option></select></header>
+<main class="main"><div class="notice" data-k="notice"></div>
+<div class="grid"><section>
+<div class="card"><h2 data-k="cam">Live Eye Scan</h2><p class="sub">Face centered, both eyes visible, even front light, 40–60 cm away.</p>
+<div class="cam" id="stage"><video id="video" muted autoplay playsinline></video><canvas id="ov"></canvas><div class="st" id="st">Camera not started</div><div class="guide"></div></div>
+<div class="row"><button class="btn pri" id="start" data-k="start">Start Camera</button><button class="btn sec" id="scan" disabled data-k="scan">Start 10-Second Scan</button><button class="btn sec" id="stop" disabled data-k="stop">Stop</button></div>
+<div class="pg"><div id="bar"></div></div><div class="pt"><span id="state">Ready</span><span id="time">0 / 10 s</span></div></div>
+<div class="card"><h2 data-k="up">Or use a photo</h2><p class="sub">Clear front photo of the face/eyes in even light. Analysis runs in your browser.</p>
+<div class="row"><label class="btn sec"><span data-k="photo">📷 Take Photo</span><input id="imgCam" type="file" accept="image/*" capture="user" hidden></label><label class="btn sec"><span data-k="pick">🖼️ Choose Image</span><input id="imgPick" type="file" accept="image/*" hidden></label></div>
+<img id="pv" alt="Eye photo preview"><p class="sub" id="scanMsg" style="margin-top:10px"></p></div>
+<div class="card"><h2 data-k="sym">Your Symptoms</h2><div class="sg" id="sg"></div>
+<div class="f2"><div><label>Which eye?</label><select id="side"><option value="both">Both eyes</option><option value="right">Right eye</option><option value="left">Left eye</option></select></div>
+<div><label>Since</label><select id="dur"><option value="lt1">Less than a day</option><option value="1-3">1–3 days</option><option value="gt3">More than 3 days</option><option value="gt14">More than 2 weeks</option></select></div>
+<div><label>Screen time today (hours)</label><input id="screen" type="number" min="0" max="20" value="6"></div>
+<div><label>Sleep last night (hours)</label><input id="sleep" type="number" min="0" max="14" value="7"></div></div></div>
+<div class="card"><h2 data-k="tests">Quick Eye Tests</h2><p class="sub">Cover one eye at a time. Look at the centre dot (left) and the fan (right) from about 40 cm.</p>
+<div class="tw"><div><canvas class="tc" id="amc" width="200" height="200"></canvas><div>Amsler grid — are lines wavy, missing or blurred?</div><select id="amsler"><option value="0">No, all straight</option><option value="1">Yes, some look distorted</option></select></div>
+<div><canvas class="tc" id="adc" width="200" height="200"></canvas><div>Fan chart — do some lines look darker or sharper?</div><select id="astig"><option value="0">No, all equal</option><option value="1">Yes, some look different</option></select></div></div></div>
+<button class="btn pri" id="gen" style="width:100%;margin-bottom:16px" data-k="gen">Analyze &amp; Save Report</button>
+<div class="card" id="rep" hidden><h2 data-k="rep">Eye Report</h2><div id="vd"></div>
+<div class="eyes"><div><div id="eL"></div>Left eye</div><div><div id="eR"></div>Right eye</div></div>
+<p class="sub" style="margin-top:6px">Illustration drawn from your measured eye colour, redness and opening — not a medical image.</p>
+<div class="sec2" data-k="find">Scan Findings</div><div id="fd"></div>
+<div class="sec2" data-k="cau">Possible Reasons (not a diagnosis)</div><div id="cz"></div>
+<div class="sec2" data-k="care">Care Plan</div><ul class="l" id="cp"></ul><div id="db"></div></div>
+</section><aside>
+<div class="card vc"><h2 data-k="eyes">Eyesight</h2><b class="vv" id="vAcu">Not assessed</b><p class="sub" id="vTxt" style="margin-top:4px"></p>
+<div class="sim" id="sim" style="display:none"><h4>Road sign 40 • EXIT 12</h4><p>How small text looks to you (approximate simulation).</p></div>
+<div class="row"><button class="btn sec" id="vref" type="button">↻ Refresh</button><a class="btn pri" href="vision.html" style="text-decoration:none">Vision Test →</a></div>
+<p class="foot">Spectacle power cannot be measured by a camera or phone — an optometrist must test it.</p></div>
+<div class="card"><h2 data-k="met">Live Indicators</h2><div class="mt">
+<div class="metric" id="mface"><span>Face</span><b id="face">—</b></div><div class="metric" id="mblink"><span>Blinks</span><b id="blink">0</b></div>
+<div class="metric" id="mopen"><span>Eye opening</span><b id="open">—</b></div><div class="metric" id="mgaze"><span>Gaze alignment</span><b id="gaze">—</b></div>
+<div class="metric" id="mquality"><span>Scan quality</span><b id="quality">—</b></div></div></div>
+</aside></div></main>
+<script>
+const T={
+en:{title:'Eye & Symptom Screening',sub:'Eye scan • redness cause • care plan',notice:'⚠️ Screening estimate only — not a medical eye exam. It cannot diagnose eye disease or measure spectacle power. The care plan is general guidance, not a drug prescription.',cam:'Live Eye Scan',start:'Start Camera',scan:'Start 10-Second Scan',stop:'Stop',up:'Or use a photo',photo:'📷 Take Photo',pick:'🖼️ Choose Image',sym:'Your Symptoms',tests:'Quick Eye Tests',gen:'Analyze & Save Report',rep:'Eye Report',find:'Scan Findings',cau:'Possible Reasons (not a diagnosis)',care:'Care Plan',eyes:'Eyesight',met:'Live Indicators'},
+hi:{title:'आँख और लक्षण स्क्रीनिंग',sub:'आई स्कैन • लालिमा का कारण • केयर प्लान',notice:'⚠️ यह केवल स्क्रीनिंग अनुमान है, आँखों की मेडिकल जाँच नहीं। यह बीमारी या चश्मे का नंबर तय नहीं करता। केयर प्लान सामान्य सलाह है, दवा का पर्चा नहीं।',cam:'लाइव आई स्कैन',start:'कैमरा शुरू करें',scan:'10 सेकंड स्कैन शुरू करें',stop:'रोकें',up:'या फोटो इस्तेमाल करें',photo:'📷 फोटो लें',pick:'🖼️ इमेज चुनें',sym:'आपके लक्षण',tests:'त्वरित आँख परीक्षण',gen:'विश्लेषण करें और रिपोर्ट सेव करें',rep:'आँख रिपोर्ट',find:'स्कैन निष्कर्ष',cau:'संभावित कारण (निदान नहीं)',care:'केयर प्लान',eyes:'आँखों की रोशनी',met:'लाइव संकेतक'},
+mr:{title:'डोळे व लक्षणे स्क्रीनिंग',sub:'आय स्कॅन • लालसरपणाचे कारण • केअर प्लॅन',notice:'⚠️ हे फक्त स्क्रीनिंग अनुमान आहे, वैद्यकीय तपासणी नाही. यातून आजार किंवा चष्म्याचा नंबर ठरत नाही. केअर प्लॅन सामान्य सल्ला आहे, औषधाची चिठ्ठी नाही.',cam:'लाइव्ह आय स्कॅन',start:'कॅमेरा सुरू करा',scan:'10 सेकंद स्कॅन सुरू करा',stop:'थांबवा',up:'किंवा फोटो वापरा',photo:'📷 फोटो घ्या',pick:'🖼️ इमेज निवडा',sym:'तुमची लक्षणे',tests:'जलद डोळ्यांच्या चाचण्या',gen:'विश्लेषण करा व रिपोर्ट सेव्ह करा',rep:'डोळ्यांचा रिपोर्ट',find:'स्कॅन निष्कर्ष',cau:'संभाव्य कारणे (निदान नाही)',care:'केअर प्लॅन',eyes:'दृष्टी',met:'लाइव्ह निर्देशक'},
+ur:{title:'آنکھ اور علامات اسکریننگ',sub:'آئی اسکین • سرخی کی وجہ • کیئر پلان',notice:'⚠️ یہ صرف اسکریننگ کا اندازہ ہے، طبی معائنہ نہیں۔ یہ بیماری یا عینک کا نمبر طے نہیں کرتا۔ کیئر پلان عمومی مشورہ ہے، دوا کا نسخہ نہیں۔',cam:'لائیو آئی اسکین',start:'کیمرہ شروع کریں',scan:'10 سیکنڈ اسکین شروع کریں',stop:'روکیں',up:'یا تصویر استعمال کریں',photo:'📷 تصویر لیں',pick:'🖼️ تصویر منتخب کریں',sym:'آپ کی علامات',tests:'فوری آنکھ ٹیسٹ',gen:'تجزیہ کریں اور رپورٹ محفوظ کریں',rep:'آنکھ کی رپورٹ',find:'اسکین نتائج',cau:'ممکنہ وجوہات (تشخیص نہیں)',care:'کیئر پلان',eyes:'بینائی',met:'لائیو اشارے'}};
+let lang=localStorage.getItem('neuroGuardianLanguage')||'en';
+const $=id=>document.getElementById(id),t=k=>(T[lang]||T.en)[k]||T.en[k]||k;
+function apply(){document.documentElement.dir=lang==='ur'?'rtl':'ltr';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=t(e.dataset.k))}
+$('lang').value=lang;$('lang').onchange=e=>{lang=e.target.value;localStorage.setItem('neuroGuardianLanguage',lang);apply()};
+const SYM=[['itch','Itching'],['water','Watering'],['disch','Sticky discharge / crusting'],['pain','Eye pain'],['dry','Burning / gritty / dry'],['photo','Light sensitivity'],['blur','Blurred vision (new)'],['halo','Halos around lights'],['hn','Headache with nausea'],['inj','Injury / something in eye'],['lens','Contact lens use'],['allergy','Allergy / sneezing'],['sick','Contact with red-eye person'],['swell','Eyelid swelling'],['loss','Sudden vision loss']];
+$('sg').innerHTML=SYM.map(([k,l])=>`<label><input type="checkbox" id="s_${k}">${l}</label>`).join('');
+/* ---- test drawings ---- */
+(function(){const x=$('amc').getContext('2d');x.strokeStyle='#222';for(let i=0;i<=10;i++){x.beginPath();x.moveTo(i*20,0);x.lineTo(i*20,200);x.moveTo(0,i*20);x.lineTo(200,i*20);x.stroke()}x.beginPath();x.arc(100,100,4,0,7);x.fill();
+const y=$('adc').getContext('2d');y.lineWidth=2;for(let a=0;a<180;a+=15){const r=a*Math.PI/180;y.beginPath();y.moveTo(100-90*Math.cos(r),100-90*Math.sin(r));y.lineTo(100+90*Math.cos(r),100+90*Math.sin(r));y.stroke()}})();
+/* ---- eye scan engine ---- */
+let stream=null,mesh=null,imgMesh=null,running=false,scanning=false,t0=0,timer=null,loop=null,S_=[],SL=[],SR=[],blinks=0,closed=false,lastB=0,partial=0,dip=1,dipN=0,lastS=0,scanData=null;
+const v=$('video'),ov=$('ov'),o=ov.getContext('2d'),st=$('st'),oc=document.createElement('canvas'),octx=oc.getContext('2d',{willReadFrequently:true});
+const L=[33,160,158,133,153,144],R=[362,385,387,263,373,380],LI=[468,469,470,471,472],RI=[473,474,475,476,477];
+const CL=[33,246,161,160,159,158,157,173,133,155,154,153,145,144,163,7],CR=[362,398,384,385,386,387,388,466,263,249,390,373,374,380,381,382];
+const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),ear=(x,a)=>(d(x[a[1]],x[a[5]])+d(x[a[2]],x[a[4]]))/(2*d(x[a[0]],x[a[3]]));
+const cen=(x,ids)=>({x:ids.reduce((s,i)=>s+x[i].x,0)/ids.length,y:ids.reduce((s,i)=>s+x[i].y,0)/ids.length});
+function irisX(x,e,i){const a=x[e[0]],b=x[e[3]],p=cen(x,i);return Math.max(0,Math.min(1,(p.x-Math.min(a.x,b.x))/Math.max(Math.abs(b.x-a.x),.0001)))}
+function irisY(x,e,i){const tp=(x[e[1]].y+x[e[2]].y)/2,bt=(x[e[4]].y+x[e[5]].y)/2,p=cen(x,i);return Math.max(0,Math.min(1,(p.y-tp)/Math.max(bt-tp,.0001)))}
+function mset(id,val,s){$(id).textContent=val;const b=$('m'+id);if(b)b.className='metric '+(s||'')}
+function inPoly(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if((p[i].y>y)!=(p[j].y>y)&&x<(p[j].x-p[i].x)*(y-p[i].y)/(p[j].y-p[i].y)+p[i].x)c=!c}return c}
+function eyeStats(lm,W,H,C,I){
+ const poly=C.map(i=>({x:lm[i].x*W,y:lm[i].y*H})),ic=I.map(i=>({x:lm[i].x*W,y:lm[i].y*H})),cx=ic[0].x,cy=ic[0].y,r=Math.max(2,Math.hypot(ic[1].x-ic[3].x,ic[1].y-ic[3].y)/2);
+ const xs=poly.map(p=>p.x),ys=poly.map(p=>p.y),x0=Math.max(0,Math.floor(Math.min(...xs))),x1=Math.min(W-1,Math.ceil(Math.max(...xs))),y0=Math.max(0,Math.floor(Math.min(...ys))),y1=Math.min(H-1,Math.ceil(Math.max(...ys)));
+ if(x1-x0<8||y1-y0<3)return null;
+ const w=x1-x0+1,dt=octx.getImageData(x0,y0,w,y1-y0+1).data;let n=0,R_=0,G=0,B=0,ni=0,IR=0,IG=0,IB=0;
+ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const k=((y-y0)*w+(x-x0))*4,a=dt[k],g=dt[k+1],b=dt[k+2],l=(a+g+b)/3,ds=Math.hypot(x-cx,y-cy);
+  if(ds<r*1.15){if(ds>r*.45&&ds<r*.9&&l>25&&l<235){ni++;IR+=a;IG+=g;IB+=b}continue}
+  if(!inPoly(x,y,poly)||l<70||l>245)continue;n++;R_+=a;G+=g;B+=b}
+ if(n<25)return null;R_/=n;G/=n;B/=n;const s=R_+G+B+1;
+ return{n,rgb:[R_,G,B],red:(R_-(G+B)/2)/s*100,yel:((R_+G)/2-B)/s*100,iris:ni>8?[IR/ni,IG/ni,IB/ni]:[90,60,40]}}
+function fallbackStats(W,H){const x0=W*.2|0,y0=H*.25|0,dt=octx.getImageData(x0,y0,W*.6|0,H*.5|0).data,ls=[];
+ for(let k=0;k<dt.length;k+=16)ls.push((dt[k]+dt[k+1]+dt[k+2])/3);ls.sort((a,b)=>a-b);const th=ls[ls.length*.65|0];let n=0,R_=0,G=0,B=0;
+ for(let k=0;k<dt.length;k+=8){const l=(dt[k]+dt[k+1]+dt[k+2])/3;if(l>=th&&l<245){n++;R_+=dt[k];G+=dt[k+1];B+=dt[k+2]}}
+ if(n<30)return null;R_/=n;G/=n;B/=n;const s=R_+G+B+1;return{n,rgb:[R_,G,B],red:(R_-(G+B)/2)/s*100,yel:((R_+G)/2-B)/s*100,iris:[90,60,40],low:1}}
+const avg=a=>{if(!a.length)return null;const m=k=>a.reduce((s,x)=>s+x[k],0)/a.length,c=k=>[0,1,2].map(i=>a.reduce((s,x)=>s+x[k][i],0)/a.length);return{red:m('red'),yel:m('yel'),rgb:c('rgb'),iris:c('iris')}};
+const P=(lm,i)=>({x:(1-lm[i].x)*ov.width,y:lm[i].y*ov.height});
+function draw(lm){o.clearRect(0,0,ov.width,ov.height);if(!lm)return;o.strokeStyle='rgba(118,224,204,.95)';o.lineWidth=2;
+ [CL,CR].forEach(c=>{o.beginPath();c.forEach((i,k)=>{const p=P(lm,i);k?o.lineTo(p.x,p.y):o.moveTo(p.x,p.y)});o.closePath();o.stroke()})}
+function onResults(r){
+ if(!r.multiFaceLandmarks?.length){mset('face','No','bad');mset('open','—');mset('gaze','—');mset('quality','Poor','bad');st.textContent='Face not found — center your face';draw(null);return}
+ const x=r.multiFaceLandmarks[0],eL=ear(x,L),eR=ear(x,R),e=(eL+eR)/2,xl=irisX(x,L,LI),xr=irisX(x,R,RI),ex=(xl+xr)/2,ey=(irisY(x,L,LI)+irisY(x,R,RI))/2;
+ const open=Math.min(100,Math.max(0,e/.30*100)),gx=100-Math.min(100,Math.abs(ex-.5)/.42*100),gy=100-Math.min(100,Math.abs(ey-.5)/.35*100),g=.65*gx+.35*gy,now=performance.now();
+ if(e<.17&&!closed)closed=true;if(e>.21&&closed){if(now-lastB>280)blinks++;lastB=now;closed=false}
+ if(e<.22){dip=Math.min(dip,e);dipN++}else{if(dipN>=2&&dip>=.17&&scanning)partial++;dip=1;dipN=0}
+ const vis=e>.10,q=(vis?45:0)+(e>.15?20:0)+(g>=70?20:g>=50?10:0)+15;
+ mset('face','Yes','good');mset('blink',blinks);mset('open',Math.round(open)+'%');mset('gaze',g>=75?'Aligned':'Adjust',g>=75?'good':g>=55?'warn':'bad');mset('quality',q>=80?'Good':q>=55?'Fair':'Poor',q>=80?'good':q>=55?'warn':'bad');
+ st.textContent=vis?(g>=70?'Eyes tracked':'Look at the camera'):'Move closer / open eyes';draw(x);
+ if(scanning){S_.push({vis,open,g,q,eL,eR,gd:Math.abs(xl-xr)});
+  if(now-lastS>250){lastS=now;try{oc.width=v.videoWidth;oc.height=v.videoHeight;octx.drawImage(v,0,0);const a=eyeStats(x,oc.width,oc.height,CL,LI),b=eyeStats(x,oc.width,oc.height,CR,RI);if(a)SL.push(a);if(b)SR.push(b)}catch(_){}}}}
+async function lib(){if(typeof FaceMesh==='undefined')await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';s.onload=ok;s.onerror=()=>no(new Error('lib'));document.head.appendChild(s)})}
+const loc=f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`;
+async function initMesh(){if(mesh)return;await lib();mesh=new FaceMesh({locateFile:loc});mesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.6,minTrackingConfidence:.6});mesh.onResults(onResults)}
+async function initImg(){if(imgMesh)return;await lib();imgMesh=new FaceMesh({locateFile:loc});imgMesh.setOptions({staticImageMode:true,maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.5})}
+async function frames(){if(!running||!mesh)return;try{if(v.readyState>=2)await mesh.send({image:v})}catch(e){}if(running)loop=requestAnimationFrame(frames)}
+async function start(){if(running)return;
+ try{if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){const m='Camera needs HTTPS or localhost. Use Take Photo / Choose Image instead.';st.textContent=m;alert(m);return}
+  $('start').disabled=true;st.textContent='Requesting camera…';
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
+  v.srcObject=stream;await new Promise(ok=>{if(v.readyState>=2&&v.videoWidth)ok();else v.addEventListener('loadedmetadata',ok,{once:true})});await v.play();
+  ov.width=v.videoWidth||640;ov.height=v.videoHeight||480;running=true;$('scan').disabled=false;$('stop').disabled=false;st.textContent='Camera ready — position your face in the guide';
+  initMesh().then(()=>{cancelAnimationFrame(loop);loop=requestAnimationFrame(frames)}).catch(()=>st.textContent='Camera on — AI tracking failed to load (check internet)')
+ }catch(e){if(stream){stream.getTracks().forEach(x=>x.stop());stream=null}running=false;$('start').disabled=false;
+  const m=e?.name==='NotAllowedError'?'Camera permission blocked — allow it and try again.':e?.name==='NotFoundError'?'No camera found — use a photo instead.':e?.name==='NotReadableError'?'Camera is used by another app — close it and retry.':'Camera could not start.';st.textContent=m;alert(m)}}
+function scan(){if(!running||scanning)return;scanning=true;S_=[];SL=[];SR=[];blinks=0;partial=0;closed=false;lastB=0;dip=1;dipN=0;scanData=null;t0=performance.now();$('stage').classList.add('scanning');$('scan').disabled=true;
+ timer=setInterval(()=>{const s=(performance.now()-t0)/1000;$('bar').style.width=Math.min(100,s*10)+'%';$('time').textContent=Math.min(10,s).toFixed(1)+' / 10 s';$('state').textContent='Scanning…';if(s>=10)finish()},100)}
+function finish(){scanning=false;clearInterval(timer);$('stage').classList.remove('scanning');$('bar').style.width='100%';$('state').textContent='Complete';$('scan').disabled=false;
+ if(S_.length<15){scanData=null;$('scanMsg').textContent='Scan was too short or eyes were not visible — try again in better light.';return}
+ const m=k=>S_.reduce((s,x)=>s+x[k],0)/S_.length;
+ scanData={src:'camera',vis:S_.filter(s=>s.vis).length/S_.length,open:m('open'),g:m('g'),q:m('q'),asym:S_.reduce((s,x)=>s+Math.abs(x.eL-x.eR)/Math.max(x.eL,x.eR,.01),0)/S_.length,gd:m('gd'),blinks,partial,bpm:blinks*6,L:avg(SL),R:avg(SR)};
+ $('scanMsg').textContent='✓ Scan complete. Add your symptoms below, then press Analyze & Save Report.'}
+function stop(){running=false;scanning=false;clearInterval(timer);cancelAnimationFrame(loop);if(stream){stream.getTracks().forEach(x=>x.stop());stream=null}v.srcObject=null;$('start').disabled=false;$('scan').disabled=true;$('stop').disabled=true;st.textContent='Camera not started';$('stage').classList.remove('scanning');o.clearRect(0,0,ov.width,ov.height)}
+$('start').onclick=start;$('scan').onclick=scan;$('stop').onclick=stop;window.onbeforeunload=stop;
+/* ---- photo analysis ---- */
+async function handleImg(f){if(!f||!f.type.startsWith('image/'))return;const url=URL.createObjectURL(f),im=new Image();
+ im.onload=async()=>{$('pv').src=url;$('pv').style.display='block';$('scanMsg').textContent='Analyzing photo…';
+  const W=Math.min(960,im.naturalWidth),H=Math.round(im.naturalHeight*W/im.naturalWidth);oc.width=W;oc.height=H;octx.drawImage(im,0,0,W,H);let res=null;
+  try{await initImg();res=await new Promise(async ok=>{imgMesh.onResults(ok);setTimeout(()=>ok(null),9000);try{await imgMesh.send({image:oc})}catch(e){ok(null)}})}catch(e){}
+  if(res?.multiFaceLandmarks?.length){const lm=res.multiFaceLandmarks[0],eL=ear(lm,L),eR=ear(lm,R);
+   scanData={src:'photo',vis:1,open:Math.min(100,(eL+eR)/2/.30*100),g:null,q:80,asym:Math.abs(eL-eR)/Math.max(eL,eR,.01),gd:Math.abs(irisX(lm,L,LI)-irisX(lm,R,RI)),blinks:null,partial:null,bpm:null,L:eyeStats(lm,W,H,CL,LI),R:eyeStats(lm,W,H,CR,RI)};
+   $('scanMsg').textContent=(scanData.L||scanData.R)?'✓ Eyes found in photo. Add symptoms, then press Analyze & Save Report.':'Face found but eyes too small/closed — retake closer with eyes open.'}
+  else{const fb=fallbackStats(W,H);scanData=fb?{src:'photo',low:1,vis:1,open:null,g:null,q:50,asym:null,gd:null,blinks:null,partial:null,bpm:null,L:fb,R:fb}:null;
+   $('scanMsg').textContent=fb?'Face not detected — using approximate colour analysis (low confidence). Retake with both eyes visible for a reliable result.':'Could not analyze this photo — retake in good light.'}};
+ im.src=url}
+$('imgCam').onchange=e=>handleImg(e.target.files[0]);$('imgPick').onchange=e=>handleImg(e.target.files[0]);
+/* ---- eyesight (from Vision Test module) ---- */
+const BL={7:0,6:.6,5:1,4:1.7,3:2.8,2:4.2,1:6};
+function vis(){let x=null;try{x=JSON.parse(localStorage.getItem('neuroguardian_vision_result')||'null')}catch(e){}if(!x||!x.acuity)return{acu:null,line:null,key:'none'};const n=Number(x.line);return{acu:x.acuity,line:n,key:n>=7?'good':n>=4?'warn':'bad'}}
+function m6(a){const m=/^(\d+)\/(\d+)$/.exec(a||'');if(!m)return a;return +m[1]==6?a:'6/'+Math.round(+m[2]/+m[1]*6)}
+function updVision(){const x=vis();$('vAcu').textContent=x.acu?x.acu+'  ('+m6(x.acu)+')':'Not assessed';
+ $('vTxt').textContent=x.key==='good'?'Good visual acuity (latest Vision Test).':x.key==='warn'?'Reduced visual acuity — an optometrist test is advised.':x.key==='bad'?'Poor visual acuity — see an eye doctor soon.':'Complete the Vision Test to show your eyesight here.';
+ $('sim').style.display=x.acu?'block':'none';$('sim').style.filter='blur('+(BL[x.line]??0)+'px)'}
+$('vref').onclick=updVision;window.addEventListener('focus',updVision);window.addEventListener('storage',e=>{if(e.key==='neuroguardian_vision_result')updVision()});
+/* ---- realistic eye drawing ---- */
+function eyeSVG(id,s,open){const rgb=(s?s.rgb:[225,215,210]).map(Math.round),ir=(s?s.iris:[90,60,40]).map(Math.round),red=s?Math.max(0,Math.min(1,(s.red-4)/14)):0,op=Math.max(.45,Math.min(1,(open==null?75:open)/100*1.1)),tp=55-48*op,bt=55+34*op,path=`M8 55 Q100 ${tp} 192 55 Q100 ${bt} 8 55 Z`;
+ let ves='',fib='';for(let i=0;i<16;i++){const a=i/16*6.283,x0=100+Math.cos(a)*88,y0=55+Math.sin(a)*38,x1=100+Math.cos(a)*30,y1=55+Math.sin(a)*14;ves+=`<path d="M${x0} ${y0} Q${(x0+x1)/2+(i%3-1)*8} ${(y0+y1)/2+(i%2?6:-6)} ${x1} ${y1}" stroke="rgba(185,28,40,${(.12+red*.75).toFixed(2)})" stroke-width="${i%3?1:1.7}" fill="none"/>`}
+ for(let i=0;i<24;i++){const a=i/24*6.283;fib+=`<line x1="${100+Math.cos(a)*11}" y1="${55+Math.sin(a)*11}" x2="${100+Math.cos(a)*25}" y2="${55+Math.sin(a)*25}" stroke="rgba(255,255,255,.18)"/>`}
+ return`<svg viewBox="0 0 200 110" class="eyesvg"><defs><clipPath id="c${id}"><path d="${path}"/></clipPath><radialGradient id="i${id}"><stop offset=".3" stop-color="rgb(${ir})"/><stop offset="1" stop-color="rgb(${ir.map(x=>Math.round(x*.45))})"/></radialGradient><radialGradient id="s${id}" cx=".5" cy=".5" r=".6"><stop offset=".6" stop-color="rgba(0,0,0,0)"/><stop offset="1" stop-color="rgba(60,20,20,.35)"/></radialGradient></defs><path d="${path}" fill="rgb(${rgb})"/><g clip-path="url(#c${id})">${ves}<circle cx="100" cy="55" r="27" fill="url(#i${id})"/>${fib}<circle cx="100" cy="55" r="27" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="2.5"/><circle cx="100" cy="55" r="11" fill="#050505"/><ellipse cx="91" cy="46" rx="5" ry="3.5" fill="rgba(255,255,255,.85)"/><circle cx="109" cy="64" r="2.2" fill="rgba(255,255,255,.5)"/><rect width="200" height="110" fill="url(#s${id})"/></g><path d="${path}" fill="none" stroke="#5b3a2e" stroke-width="3"/></svg>`}
+/* ---- analysis: findings, reasons, care plan ---- */
+const GL=['No visible redness','Mild redness','Moderate redness','Marked redness'],gr=x=>x==null?null:x<7?0:x<11?1:x<16?2:3;
+const readSym=()=>{const s={side:$('side').value,dur:$('dur').value,screen:+$('screen').value||0,sleep:$('sleep').value===''?7:+$('sleep').value,amsler:$('amsler').value==='1',astig:$('astig').value==='1'};SYM.forEach(([k])=>s[k]=$('s_'+k).checked);return s};
+const CN={strain:['Digital eye strain / dry eye','long screen time, low or incomplete blinking, dryness'],allergy:['Allergic irritation','itching, watering or allergy history, usually both eyes'],infect:['Infective conjunctivitis (viral/bacterial)','sticky discharge/crusting or contact with a red-eye person'],lens:['Contact-lens irritation','lens wear with discomfort or light sensitivity'],irr:['Irritants / lack of sleep','dryness, watering, poor sleep, smoke/dust/chlorine'],injury:['Injury / foreign body','recent injury or something in the eye'],urgent:['Inflammation inside the eye (needs an eye doctor)','pain with light sensitivity, blur, halos or headache with nausea']};
+function analyze(){
+ const sd=scanData,S=readSym(),LS=sd?.L,RS=sd?.R,gL=gr(LS?.red),gR=gr(RS?.red),both=S.side==='both',F=[];
+ const reds=[LS?.red,RS?.red].filter(x=>x!=null),red=reds.length?reds.reduce((a,b)=>a+b)/reds.length:null,G=red==null?0:gr(red),yel=[LS?.yel,RS?.yel].filter(x=>x!=null);
+ const y=yel.length?yel.reduce((a,b)=>a+b)/yel.length:null,low=sd?.low?' (low confidence)':'';
+ if(sd&&(LS||RS)){F.push(['Redness (left / right)',(gL==null?'—':GL[gL])+' / '+(gR==null?'—':GL[gR])+low,G>=2?'bad':G==1?'warn':'good']);
+  if(gL!=null&&gR!=null&&Math.abs(gL-gR)>=1)F.push(['One eye redder','Left and right differ — note which eye is worse','warn']);
+  if(y!=null)F.push(['White-of-eye tint',y>11?'Yellowish tint (lighting can cause this — recheck in daylight)':'No yellow tint seen',y>11?'warn':'good'])}
+ else F.push(['Eye scan','No scan data — result is based on symptoms only','warn']);
+ if(sd?.bpm!=null){const b=sd.bpm;F.push(['Blink rate (per minute)',b+(b<8?' — low (dry-eye / screen strain risk)':b>26?' — high (irritation / fatigue)':' — normal')+(sd.partial>=2?' • '+sd.partial+' incomplete blinks':''),b<8||b>26||sd.partial>=2?'warn':'good'])}
+ if(sd?.open!=null){const fl=sd.asym!=null&&sd.asym>.25;F.push(['Eyelid opening',Math.round(sd.open)+'%'+(fl?' — uneven between eyes (possible lid droop)':''),fl||sd.open<45?'warn':'good'])}
+ if(sd?.gd!=null){const fl=sd.gd>.14;F.push(['Eye alignment',fl?'Eyes not pointing the same way (screen for misalignment)':'Eyes aligned',fl?'warn':'good'])}
+ if(sd?.g!=null)F.push(['Gaze steadiness',Math.round(sd.g)+'%',sd.g>=70?'good':'warn']);
+ const V=vis();F.push(['Eyesight (Vision Test)',V.acu?V.acu+' ('+m6(V.acu)+')':'Not tested',V.key==='good'?'good':V.key==='none'?'warn':V.key]);
+ F.push(['Amsler grid',S.amsler?'Distortion reported — central vision check advised':'Normal',S.amsler?'bad':'good']);F.push(['Fan chart',S.astig?'Uneven lines — possible astigmatism':'Normal',S.astig?'warn':'good']);
+ const urgent=S.loss||(S.pain&&(S.blur||S.halo||S.photo||S.hn))||(S.inj&&(S.pain||S.blur))||(S.hn&&S.halo);
+ const flags=[G>=2,S.disch,S.pain,S.blur,S.swell,S.dur!=='lt1'&&G>=1&&S.dur!=='1-3',sd?.asym>.25,sd?.gd>.14,S.amsler,S.astig,V.key==='bad'||V.key==='warn'].some(Boolean);
+ const tier=urgent?'red':flags?'yellow':'green';
+ const c={strain:0,allergy:0,infect:0,lens:0,irr:0,injury:0,urgent:0};
+ if(S.screen>=6)c.strain+=2;if(S.screen>=9)c.strain++;if(S.dry)c.strain+=2;if(sd?.bpm!=null&&sd.bpm<10)c.strain+=2;if(sd?.partial>=2)c.strain++;if(S.sleep<6){c.strain++;c.irr++}
+ if(S.itch)c.allergy+=3;if(S.water)c.allergy++;if(S.allergy)c.allergy+=2;if(both)c.allergy++;if(S.swell)c.allergy++;
+ if(S.disch)c.infect+=3;if(S.sick)c.infect+=2;if(!both)c.infect++;if(S.water)c.infect++;if(S.dur!=='lt1')c.infect++;
+ if(S.lens){c.lens+=3;if(S.pain||S.photo)c.lens+=2}if(S.dry)c.irr++;if(S.water)c.irr++;if(!S.itch&&!S.disch&&G>0)c.irr++;
+ if(S.inj){c.injury+=4;if(!both)c.injury++}if(S.pain)c.urgent++;if(S.photo)c.urgent++;if(S.blur)c.urgent++;if(S.halo)c.urgent+=2;if(S.hn)c.urgent+=2;
+ const top=Object.entries(c).filter(([k,s])=>s>=2&&(G>0||k==='urgent'||S.dry||S.itch||S.water)).sort((a,b)=>b[1]-a[1]).slice(0,3);
+ const care=['Do not rub your eyes; wash hands before touching them.','Follow the 20-20-20 rule: every 20 minutes look 20 feet away for 20 seconds.','Drink enough water and sleep 7–8 hours.'];
+ const ids=top.map(x=>x[0]);
+ if(ids.includes('strain'))care.push('Blink fully on purpose, keep the screen just below eye level, take a warm compress for 5 minutes, and ask a pharmacist or eye doctor about preservative-free lubricating (artificial tear) drops.');
+ if(ids.includes('allergy'))care.push('Use a cold compress, avoid dust/pollen triggers, rinse the face with clean water, and ask a pharmacist or doctor about anti-allergy eye drops.');
+ if(ids.includes('infect'))care.push('Use a separate towel, wipe discharge with clean wet cotton from inner to outer corner, stop eye makeup and contact lenses, and see a doctor within 24–48 hours.');
+ if(ids.includes('lens')||S.lens)care.push('Take out contact lenses now and wear glasses; never sleep in lenses. Pain or light sensitivity with lenses needs a doctor the same day.');
+ if(ids.includes('irr'))care.push('Rinse with clean water, avoid smoke, dust, chlorine and strong AC air, and rest your eyes.');
+ if(ids.includes('injury')||S.inj)care.push('Do not press or rub, do not remove anything stuck in the eye, cover loosely with a clean shield and see an eye doctor today.');
+ if(V.key==='warn'||V.key==='bad'||S.astig)care.push('Book an optometrist for refraction testing — spectacle power cannot be measured by this app.');
+ if(sd?.asym>.25)care.push('Eyelid droop or unevenness: get an eye exam. Sudden droop with double vision or headache is an emergency.');
+ if(sd?.gd>.14)care.push('Misaligned eyes or double vision need an eye-doctor check.');
+ if(S.amsler)care.push('Wavy or missing lines on the Amsler grid need an eye-doctor check soon.');
+ care.push('Do not use steroid or antibiotic eye drops unless a doctor prescribes them.');
+ care.push(tier==='red'?'Go to an eye casualty / emergency department today and avoid driving yourself.':tier==='yellow'?'See an eye doctor within 1–2 days; sooner if pain, light sensitivity or blur increases.':'Repeat this scan in 48 hours; see a doctor if not better in 3 days.');
+ const VT={red:['🔴','Urgent: see an eye doctor / emergency care today','Your answers include warning signs that should not wait.','#fdeceb'],yellow:['🟡','Eye-doctor visit advised within 1–2 days','Some findings need a professional look.','#fff5e3'],green:['🟢','Home care is reasonable','No warning signs found in this screening.','#eaf8ef']}[tier];
+ $('rep').hidden=false;$('vd').innerHTML=`<div class="vd" style="background:${VT[3]}"><h3>${VT[0]} ${VT[1]}</h3><p>${VT[2]}</p></div>`;
+ const op=sd?.open;$('eL').innerHTML=eyeSVG('L',LS||RS,op);$('eR').innerHTML=eyeSVG('R',RS||LS,op);
+ $('fd').innerHTML=F.map(f=>`<div class="fi ${f[2]}"><span>${f[0]}</span><b>${f[1]}</b></div>`).join('');
+ $('cz').innerHTML=top.length?top.map(([k,s])=>`<div class="cz"><i>${s>=5?'STRONG MATCH':s>=3?'POSSIBLE MATCH':'WEAK MATCH'}</i><br><b>${CN[k][0]}</b><br>Why: ${CN[k][1]}.</div>`).join(''):'<div class="cz">No clear cause stands out — no redness or only mild signs.</div>';
+ $('cp').innerHTML=care.map(x=>`<li>${x}</li>`).join('');$('rep').scrollIntoView({behavior:'smooth',block:'start'});
+ const names=top.map(x=>CN[x[0]][0]).join(', ');
+ saveEyeNeuroReportToDatabase({tier,summary:VT[1]+(names?'. Possible reasons: '+names:'.'),details:{'Redness (L / R)':(gL==null?'-':GL[gL])+' / '+(gR==null?'-':GL[gR]),'Blink Rate':sd?.bpm==null?'-':sd.bpm+' / min','Eyelid Opening':sd?.open==null?'-':Math.round(sd.open)+'%','Eyesight Status':V.acu||'Not tested','Possible Reasons':names||'-','Care Plan':care.slice(-2).join(' ')}})}
+$('gen').onclick=analyze;
+/* ---- database (same contract as before: POST /api/reports) ---- */
+async function saveEyeNeuroReportToDatabase(r){const ds=$('db');
+ try{const ses=window.NG&&typeof NG.getSession==='function'?NG.getSession():JSON.parse(localStorage.getItem('neuroguardianSession')||sessionStorage.getItem('neuroguardianSession')||'null');
+  if(!ses||!ses.email){ds.textContent='Login to save this report to your history.';return}
+  const API=location.protocol==='file:'?'http://127.0.0.1:5000':'';
+  const res=await fetch(API+'/api/reports',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({module:'eyescan',title:'Eye & Neurological Screening',tier:r.tier,summary:r.summary,details:r.details,user:ses.email})});
+  const data=await res.json();ds.textContent=res.ok&&data.success?'✓ Saved to your report history':'Could not save the report.';
+ }catch(e){ds.textContent='Server not reachable — report not saved.'}}
+apply();updVision();
+</script></body></html>
